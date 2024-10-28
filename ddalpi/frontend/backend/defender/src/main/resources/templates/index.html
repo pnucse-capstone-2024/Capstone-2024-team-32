@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defender UI</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/templates/css/style.css">.
+    <style>
+        /* 테이블 가로 간격을 동일하게 설정 */
+        table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: center;
+            word-wrap: break-word; /* 내용이 길어질 때 줄바꿈 */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <!-- 제목 -->
+    <h1 class="text-center mb-4">Defender</h1>
+
+    <!-- 방어 버튼 -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <button id="defense-btn-1" class="btn btn-primary btn-block">특정 IP SLEEP</button>
+        </div>
+        <div class="col-md-3">
+            <button id="defense-btn-2" class="btn btn-secondary btn-block">VM 방화벽을 이용한 패킷 드랍</button>
+        </div>
+        <div class="col-md-3">
+            <button id="defense-btn-3" class="btn btn-success btn-block">더머서버 리다이렉트</button>
+        </div>
+        <div class="col-md-3">
+            <button id="defense-btn-4" class="btn btn-warning btn-block">OpenWRT,RPi를 이용한 중개방어</button>
+        </div>
+    </div>
+
+    <!-- 방어 메커니즘 상태 -->
+    <div id="defense-status" class="alert alert-info text-center">특정 IP SLEEP 방어법이 실행 중입니다.</div>
+
+    <!-- 방어 메커니즘 설명 -->
+    <div class="mechanism-description">
+        <h4 class="text-center mb-3">특정 IP SLEEP</h4>
+        <p class="text-center">특정 IP의 요청 횟수에 따라 CPU Sleep 시간을 동적으로 늘려 과도한 요청을 억제하는 방어법입니다.<br>
+            서버에 들어오는 각 IP의 단위 시간당 요청을 기록하고, 요청 횟수가 많아질수록 Sleep 시간을 증가시켜 시스템 자원을 보호합니다.<br>
+            미들웨어에서 스레드마다 개별적으로 Sleep 시간을 적용하여 공격자의 트래픽을 지연시키는 방식입니다.<br>
+            이를 통해 공격자가 공격을 중단하도록 유도하고, 정상 사용자의 서비스 품질을 유지할 수 있습니다.<br>
+            결과적으로 시스템의 안정성을 높이고 자원을 효율적으로 활용할 수 있습니다.</p>
+    </div>
+
+    <!-- 실시간 현황 (Grafana 연동 가능) -->
+    <div class="row text-center mb-4">
+        <div class="col-md-6 mb-2">
+            <div class="card">
+                <div class="card-header">
+                    CPU 사용량
+                </div>
+                <div class="card-body">
+                    <iframe src="http://172.20.10.5/d/bdyni2uexy9z4f/cpu-use?orgId=1&theme=light&refresh=5s"
+                            width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="card">
+                <div class="card-header">
+                    POD 수
+                </div>
+                <div class="card-body">
+                    <iframe src="http://172.20.10.5/d/adymqcd08dwxsf/ddalpi-pod-number?orgId=1&theme=light&refresh=5s"
+                            width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-12 mb-2">
+            <div class="card">
+                <div class="card-header">
+                    공격자 의심 IP 목록
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>Count</th>
+                        </tr>
+                        </thead>
+                        <tbody id="output">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (필요한 경우) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
+
+<script>
+    // 방어법 1 버튼 클릭 시 POST 요청
+    document.getElementById('defense-btn-1').addEventListener('click', () => {
+        sendDefenseStatus('ip_sleep');
+    });
+
+    // 방어법 2 버튼 클릭 시 POST 요청
+    document.getElementById('defense-btn-2').addEventListener('click', () => {
+        sendDefenseStatus('vm_guard');
+    });
+
+    // 방어법 3 버튼 클릭 시 POST 요청
+    document.getElementById('defense-btn-3').addEventListener('click', () => {
+        sendDefenseStatus('load_balancing');
+    });
+
+    document.getElementById('defense-btn-4').addEventListener('click', () => {
+        sendDefenseStatus('open_wrt');
+    });
+
+    // 방어 메커니즘 상태를 서버로 보내는 함수
+    function sendDefenseStatus(status) {
+        fetch('http://172.20.10.5/ddalpi/defense_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ defense_status: status })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();  // JSON 대신 텍스트로 응답을 받음
+                } else {
+                    throw new Error('POST 요청에 실패했습니다.');
+                }
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // 성공 시 방어 메커니즘 상태 업데이트
+                document.getElementById('defense-status').textContent = `방어 메커니즘 ${status}이 실행 중입니다.`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // function fetchData() {
+    //     fetch('http://172.20.10.5/ip/get_ip')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             const outputDiv = document.getElementById('output');
+    //
+    //             // 이전 데이터를 지워줌
+    //             outputDiv.innerHTML = '';
+    //
+    //             // 데이터 배열을 순회하면서 ip와 count 테이블 row로 출력
+    //             data.forEach(item => {
+    //                 const ip = item.ip;
+    //                 const count = item.count;
+    //                 const row = document.createElement('tr');
+    //
+    //                 const ipCell = document.createElement('td');
+    //                 ipCell.textContent = ip;
+    //                 row.appendChild(ipCell);
+    //
+    //                 const countCell = document.createElement('td');
+    //                 countCell.textContent = count;
+    //                 row.appendChild(countCell);
+    //
+    //                 outputDiv.appendChild(row);
+    //             });
+    //         })
+    //         .catch(error => console.error('Error:', error));
+    // }
+    //
+    // // 1초마다 fetchData 함수 호출
+    // setInterval(fetchData, 1000);
+    //
+    // // 페이지가 로드되면 바로 데이터를 한 번 불러옴
+    // fetchData();
+</script>
+
+</body>
+</html>
