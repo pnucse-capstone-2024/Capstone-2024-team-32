@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attacker</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/templates/css/style.css">
+    <style>
+        label {
+            font-size: 1.7rem; /* 글자 크기 키움 */
+            font-weight: bold; /* 굵게 처리 */
+        }
+
+        #target-url {
+            height: 60px; /* 원하는 높이 값 설정 */
+            font-size: 1.5rem; /* 글자 크기도 함께 조정할 수 있음 */
+        }
+
+        /* 공격자 섹션 간의 간격을 추가 */
+        .attacker-section {
+            margin-bottom: 3rem; /* 3rem 간격을 추가 */
+        }
+
+        /* 구분선 스타일링 */
+        .divider {
+            border: 0;
+            height: 2px; /* 두께 설정 */
+            background-color: #ccc; /* 구분선 색상 설정 */
+            margin: 3rem 0; /* 위아래 간격 설정 */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <!-- 제목 -->
+    <h1 class="text-center mb-4">Attacker</h1>
+
+    <!-- URL 입력 필드 -->
+    <div class="form-group">
+        <label for="target-url">Target URL</label>
+        <input type="text" id="target-url" class="form-control" placeholder="http://">
+    </div>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-6">
+            <button id="start-attack" class="btn btn-danger btn-block" onclick="startAttack()">전체 공격 시작</button>
+        </div>
+        <div class="col-md-6">
+            <button id="stop-attack" class="btn btn-success btn-block">전체 공격 중단</button>
+        </div>
+    </div>
+
+    <!-- 추가한 버튼들 -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <button class="btn btn-secondary btn-block" onclick="scrollToAttacker(1)">공격자 1로 이동</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-secondary btn-block" onclick="scrollToAttacker(2)">공격자 2로 이동</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-secondary btn-block" onclick="scrollToAttacker(3)">공격자 3으로 이동</button>
+        </div>
+    </div>
+
+    <!-- 공격자 1 -->
+    <div class="attacker-section" id="attacker1">
+        <label>공격자 1</label>
+        <div class="row text-center mb-4">
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        상태
+                    </div>
+                    <div class="card-body">
+                        <img id="image1" src="image/1.png" alt="이미지 3" style="width: 100%; height: 350px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        응답 시간
+                    </div>
+                    <div class="card-body" style="height: auto; min-height: 350px;">
+                        <iframe class="plotIframe" src="http://localhost:7000/plot" title="localhost 내용"
+                                style="width: 100%; height: 350px;" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 공격 시작/중단 버튼 -->
+        <div class="row text-center mb-4">
+            <div class="col-md-6">
+                <button id="start-attack1" class="btn btn-danger btn-block">공격자 1 시작</button>
+            </div>
+            <div class="col-md-6">
+                <button id="stop-attack1" class="btn btn-success btn-block">공격자 1 중단</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구분선 추가 -->
+    <hr class="divider">
+
+    <!-- 공격자 2 -->
+    <div class="attacker-section" id="attacker2">
+        <label>공격자 2</label>
+        <div class="row text-center mb-4">
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        상태
+                    </div>
+                    <div class="card-body">
+                        <img id="image2" src="image/1.png" alt="이미지 3" style="width: 100%; height: 350px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        응답 시간
+                    </div>
+                    <div class="card-body" style="height: auto; min-height: 350px;">
+                        <iframe class="plotIframe" src="http://localhost:7000/plot" title="localhost 내용"
+                                style="width: 100%; height: 350px;" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 공격 시작/중단 버튼 -->
+        <div class="row text-center mb-4">
+            <div class="col-md-6">
+                <button id="start-attack2" class="btn btn-danger btn-block">공격자 2 시작</button>
+            </div>
+            <div class="col-md-6">
+                <button id="stop-attack2" class="btn btn-success btn-block">공격자 2 중단</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구분선 추가 -->
+    <hr class="divider">
+
+    <!-- 공격자 3 -->
+    <div class="attacker-section" id="attacker3">
+        <label>공격자 3</label>
+        <div class="row text-center mb-4">
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        상태
+                    </div>
+                    <div class="card-body">
+                        <img id="image3" src="image/1.png" alt="이미지 3" style="width: 100%; height: 350px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        응답 시간
+                    </div>
+                    <div class="card-body" style="height: auto; min-height: 350px;">
+                        <iframe class="plotIframe" src="http://localhost:7000/plot" title="localhost 내용"
+                                style="width: 100%; height: 350px;" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 공격 시작/중단 버튼 -->
+        <div class="row text-center mb-4">
+            <div class="col-md-6">
+                <button id="start-attack3" class="btn btn-danger btn-block">공격자 3 시작</button>
+            </div>
+            <div class="col-md-6">
+                <button id="stop-attack3" class="btn btn-success btn-block">공격자 3 중단</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS (필요한 경우) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    function scrollToAttacker(attackerNumber) {
+        const attackerSection = document.getElementById(`attacker${attackerNumber}`);
+        if (attackerSection) {
+            attackerSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function startAttack() {
+        const startButton = document.getElementById('start-attack');
+        startButton.disabled = true; // 버튼 비활성화
+
+
+        fetch('http://localhost:8080/start', { method: 'POST' })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                checkStatus(); // 상태 확인 시작
+            });
+    }
+
+    // 상태 확인 후 조건에 맞으면 박스 색상 파란색으로 변경
+    function checkStatus() {
+        setInterval(() => {
+            fetch('http://localhost:8080/attack_status', {method: 'GET'})
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    if (data.includes("완료")) {
+                        document.getElementById('start-attack').disabled = false; // 버튼 다시 활성화
+                    }
+                });
+        }, 1000); // 4초 간격으로 상태 확인
+    }
+
+    setInterval(function() {
+        var iframes = document.getElementsByClassName('plotIframe');
+        for (var i = 0; i < iframes.length; i++) {
+            iframes[i].src = iframes[i].src; // 각 iframe src를 다시 설정하여 새로고침
+        }
+    }, 1000); // 5초마다 새로고침 (5000ms)
+
+    function fetchImageData() {
+        // AJAX 요청 보내기
+        fetch('http://localhost:8080/attack_image')
+            .then(response => response.json()) // JSON 응답으로 변환
+            .then(data => {
+                // 예: 응답 데이터가 { image: 1 } 또는 { image: 2 } 같은 형식일 경우
+                if (data.image === 1) {
+                    document.getElementById('image1').src = 'image/1.png'; // 1번 공격수 이미지 변경
+                } else if (data.image === 2) {
+                    document.getElementById('image1').src = 'image/2.png'; // 2번 공격수 이미지 변경
+                }else if (data.image === 3) {
+                    document.getElementById('image1').src = 'image/3.png'; // 2번 공격수 이미지 변경
+                }else if (data.image === 4) {
+                    document.getElementById('image1').src = 'image/4.png'; // 2번 공격수 이미지 변경
+                }else if (data.image === 5) {
+                    document.getElementById('image1').src = 'image/5.png'; // 2번 공격수 이미지 변경
+                }
+            })
+            .catch(error => console.error('Error fetching image data:', error));
+    }
+
+
+    setInterval(fetchImageData, 1000);
+</script>
+</body>
+</html>
